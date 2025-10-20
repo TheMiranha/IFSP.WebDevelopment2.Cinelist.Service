@@ -5,5 +5,5 @@
 ```
 go mod tidy
 go run cmd/migrate/main.go up
-gi run cmd/api/main.go
+go run cmd/api/main.go
 ```
