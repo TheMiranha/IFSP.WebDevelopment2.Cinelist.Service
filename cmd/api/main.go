@@ -1,19 +1,11 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	infrastructure_database "cinelist/infrastructure/database"
+	infrastructure_http "cinelist/infrastructure/http"
 )
 
 func main() {
-	server := gin.Default()
-
-	server.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Hello World!",
-		})
-	})
-
-	server.Run(":8000")
+	database := infrastructure_database.ConnectDB()
+	infrastructure_http.InitializeServer(database)
 }

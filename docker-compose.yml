@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:17 # Specifies the PostgreSQL image and version
+    environment:
+      POSTGRES_DB: postgres # Name of the database to create
+      POSTGRES_USER: miranda # Username for the database
+      POSTGRES_PASSWORD: miranda # Password for the database user
+    volumes:
+      - cinelist_volume:/var/lib/postgresql/data # Mounts a named volume for data persistence
+    ports:
+      - "5432:5432" # Maps host port 5432 to container port 5432
+    restart: always # Ensures the container restarts if it stops
+
+volumes:
+  cinelist_volume: # Defines the named volume
