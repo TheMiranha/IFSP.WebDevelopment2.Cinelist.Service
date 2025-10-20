@@ -5,8 +5,8 @@ type RequestError struct {
 	Message string `json:"message"`
 }
 
-func NewRequestError(message string) RequestError {
-	return RequestError{
+func NewRequestError(message string) *RequestError {
+	return &RequestError{
 		Success: false,
 		Message: message,
 	}

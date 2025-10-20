@@ -4,6 +4,7 @@ import (
 	"cinelist/application/usecases"
 	"cinelist/infrastructure/database/repositories"
 	"cinelist/infrastructure/http/controllers"
+	"cinelist/infrastructure/http/middlewares"
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
@@ -15,14 +16,22 @@ func InitializeServer(database *sql.DB) {
 	healthController := controllers.NewHealthController()
 
 	userRepository := repositories.NewUserRepository(database)
-
 	authenticationUseCase := usecases.NewAuthenticationUseCase(userRepository)
 	authenticationController := controllers.NewAuthenticationController(authenticationUseCase)
+
+	userUseCase := usecases.NewUserUseCase(userRepository)
+	userController := controllers.NewUserController(userUseCase)
 
 	apiV1 := server.Group("/api/v1")
 	{
 		healthController.RegisterRoutes(apiV1)
 		authenticationController.RegisterRoutes(apiV1)
+
+		protected := apiV1.Group("")
+		protected.Use(middlewares.AuthenticationMiddleware())
+		{
+			userController.RegisterRoutes(protected)
+		}
 	}
 
 	server.Run(":8000")

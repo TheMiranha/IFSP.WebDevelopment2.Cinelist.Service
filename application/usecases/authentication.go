@@ -21,6 +21,12 @@ func NewAuthenticationUseCase(repo repositories.UserRepository) AuthenticationUs
 
 func (u *AuthenticationUseCase) Create(payload dtos.SignUpDTO) (dtos.SignUpResponseDTO, *dtos.RequestError) {
 
+	_, alreadyExists := u.repo.GetByEmail(payload.Email)
+
+	if alreadyExists == nil {
+		return dtos.SignUpResponseDTO{}, dtos.NewRequestError("Email already in use")
+	}
+
 	hashedPassword, err := infrastructure_utils.HashPassword(payload.Password)
 
 	if err != nil {
