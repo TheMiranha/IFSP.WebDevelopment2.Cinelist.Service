@@ -3,6 +3,7 @@ package controllers
 import (
 	"cinelist/application/usecases"
 	"cinelist/domain/dtos"
+	infrastructure_utils "cinelist/infrastructure"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,27 @@ func NewAuthenticationController(usecase usecases.AuthenticationUseCase) Authent
 
 func (c *AuthenticationController) RegisterRoutes(router *gin.RouterGroup) {
 	router.POST("/auth/sign-up", c.SignUp)
+	router.POST("/auth/sign-in", c.SignIn)
+}
+
+func (c *AuthenticationController) SignIn(ctx *gin.Context) {
+	var payload dtos.SignInDTO
+
+	err := ctx.BindJSON(&payload)
+
+	if err != nil {
+		infrastructure_utils.ThrowInvalidRequest(ctx)
+		return
+	}
+
+	usecaseResponse, usecaseError := c.usecase.SignIn(payload)
+
+	if usecaseError != nil {
+		ctx.JSON(http.StatusUnauthorized, usecaseError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, usecaseResponse)
 }
 
 func (c *AuthenticationController) SignUp(ctx *gin.Context) {
@@ -25,8 +47,7 @@ func (c *AuthenticationController) SignUp(ctx *gin.Context) {
 	err := ctx.BindJSON(&payload)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewRequestError("Invalid request"))
-
+		infrastructure_utils.ThrowInvalidRequest(ctx)
 		return
 	}
 	response, usecaseError := c.usecase.Create(payload)

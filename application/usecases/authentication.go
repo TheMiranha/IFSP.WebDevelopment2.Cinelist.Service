@@ -19,6 +19,31 @@ func NewAuthenticationUseCase(repo repositories.UserRepository) AuthenticationUs
 	return AuthenticationUseCase{repo: repo}
 }
 
+func (u *AuthenticationUseCase) SignIn(payload dtos.SignInDTO) (dtos.SignInResponseDTO, *dtos.RequestError) {
+	user, err := u.repo.GetByEmail(payload.Email)
+
+	if err != nil {
+		return dtos.SignInResponseDTO{}, dtos.NewRequestError("Invalid credentials")
+	}
+
+	samePassword := infrastructure_utils.CheckPasswordHash(payload.Password, user.Password)
+
+	if !samePassword {
+		return dtos.SignInResponseDTO{}, dtos.NewRequestError("Invalid credentials")
+	}
+
+	token, err := infrastructure_utils.GenerateJWT(user.ID)
+
+	if err != nil {
+		return dtos.SignInResponseDTO{}, dtos.NewRequestError("Error on token generation")
+	}
+
+	return dtos.SignInResponseDTO{
+		Success:     true,
+		AccessToken: token,
+	}, nil
+}
+
 func (u *AuthenticationUseCase) Create(payload dtos.SignUpDTO) (dtos.SignUpResponseDTO, *dtos.RequestError) {
 
 	_, alreadyExists := u.repo.GetByEmail(payload.Email)

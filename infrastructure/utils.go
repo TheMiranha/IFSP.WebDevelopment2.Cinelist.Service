@@ -1,9 +1,12 @@
 package infrastructure_utils
 
 import (
+	"cinelist/domain/dtos"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -41,4 +44,8 @@ func GenerateJWT(userId uuid.UUID) (string, error) {
 	tokenString, err := token.SignedString(secretKey)
 
 	return tokenString, err
+}
+
+func ThrowInvalidRequest(ctx *gin.Context) {
+	ctx.JSON(http.StatusBadRequest, dtos.NewRequestError("Invalid request"))
 }
