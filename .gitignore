@@ -1,2 +1,4 @@
 .env
 tmp/*
+cmd/api/tmp/*
+cmd/migrate/tmp/*
