@@ -19,7 +19,7 @@ func NewUserRepository(db *sql.DB) UserRepository {
 }
 
 func (repo *UserRepository) Create(user entities.User) (entities.User, error) {
-	query, err := repo.db.Prepare("insert into users(id, email, password, name, createdAt, updatedAt) values ($1, $2, $3, $4, $5, $6)")
+	query, err := repo.db.Prepare("insert into users(id, email, password, name, created_at, updated_at) values ($1, $2, $3, $4, $5, $6)")
 
 	if err != nil {
 		return entities.User{}, err
@@ -31,7 +31,7 @@ func (repo *UserRepository) Create(user entities.User) (entities.User, error) {
 }
 
 func (repo *UserRepository) GetById(id uuid.UUID) (entities.User, error) {
-	query, err := repo.db.Prepare("select id, email, password, name, createdAt, updatedAt from users where id = $1")
+	query, err := repo.db.Prepare("select id, email, password, name, created_at, updated_at from users where id = $1")
 	if err != nil {
 		return entities.User{}, err
 	}
@@ -55,7 +55,7 @@ func (repo *UserRepository) GetById(id uuid.UUID) (entities.User, error) {
 }
 
 func (repo *UserRepository) GetByEmail(email string) (entities.User, error) {
-	query, err := repo.db.Prepare("select id, email, password, name, createdAt, updatedAt from users where email = $1")
+	query, err := repo.db.Prepare("select id, email, password, name, created_at, updated_at from users where email = $1")
 	if err != nil {
 		return entities.User{}, err
 	}

@@ -12,7 +12,7 @@ func init() {
 }
 
 func upCreateTableCasts(ctx context.Context, tx *sql.Tx) error {
-	_, err := tx.Exec(`create table casts("actor" uuid not null, "movie" uuid not null, createdAt timestamp, updatedAt timestamp, foreign key("actor") references actors(id), foreign key("movie") references movies(id), primary key("actor", "movie"))`)
+	_, err := tx.Exec(`create table casts("actor" uuid not null, "movie" uuid not null, created_at timestamp, updated_at timestamp, foreign key("actor") references actors(id), foreign key("movie") references movies(id), primary key("actor", "movie"))`)
 	return err
 }
 

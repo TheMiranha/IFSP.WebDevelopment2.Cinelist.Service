@@ -12,7 +12,7 @@ func init() {
 }
 
 func upCreateTableToWatch(ctx context.Context, tx *sql.Tx) error {
-	_, err := tx.Exec(`create table to_watch("user" uuid not null, "movie" uuid not null, createdAt timestamp, updatedAt timestamp, foreign key("user") references users(id), foreign key("movie") references movies(id), primary key("user", "movie"))`)
+	_, err := tx.Exec(`create table to_watch("user" uuid not null, "movie" uuid not null, created_at timestamp, updated_at timestamp, foreign key("user") references users(id), foreign key("movie") references movies(id), primary key("user", "movie"))`)
 	return err
 }
 

@@ -12,7 +12,7 @@ func init() {
 }
 
 func upCreateTableUsers(ctx context.Context, tx *sql.Tx) error {
-	_, err := tx.Exec("create table users(id uuid primary key, email varchar(255), password varchar(255), name varchar(255), imageUrl varchar(255), createdAt timestamp, updatedAt timestamp)")
+	_, err := tx.Exec("create table users(id uuid primary key, email varchar(255), password varchar(255), name varchar(255), image_url varchar(255), created_at timestamp, updated_at timestamp)")
 	return err
 }
 

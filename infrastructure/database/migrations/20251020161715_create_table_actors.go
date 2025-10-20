@@ -12,7 +12,7 @@ func init() {
 }
 
 func upCreateTableActors(ctx context.Context, tx *sql.Tx) error {
-	_, err := tx.Exec(`create table actors(id uuid primary key, name varchar(255), imageUrl varchar(255), createdAt timestamp, updatedAt timestamp)`)
+	_, err := tx.Exec(`create table actors(id uuid primary key, name varchar(255), image_url varchar(255), created_at timestamp, updated_at timestamp)`)
 	return err
 }
 

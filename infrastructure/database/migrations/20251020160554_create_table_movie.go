@@ -12,7 +12,7 @@ func init() {
 }
 
 func upCreateTableMovie(ctx context.Context, tx *sql.Tx) error {
-	_, err := tx.Exec("create table movies(id uuid primary key, title varchar(255), descriotion varchar(255), releasedAt timestamp, imageUrl varchar(255), tmdbRate decimal(10, 2), createdAt timestamp, updatedAt timestamp)")
+	_, err := tx.Exec("create table movies(id uuid primary key, title varchar(255), description varchar(255), released_at timestamp, image_url varchar(255), tmdb_rate decimal(10, 2), created_at timestamp, updated_at timestamp)")
 	return err
 }
 
