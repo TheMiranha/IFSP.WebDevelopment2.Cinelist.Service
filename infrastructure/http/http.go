@@ -17,6 +17,7 @@ func InitializeServer(database *sql.DB) {
 
 	userRepository := repositories.NewUserRepository(database)
 	movieRepository := repositories.NewMovieRepository(database)
+	actorRepository := repositories.NewActorRepository(database)
 
 	authenticationUseCase := usecases.NewAuthenticationUseCase(userRepository)
 	authenticationController := controllers.NewAuthenticationController(authenticationUseCase)
@@ -27,11 +28,15 @@ func InitializeServer(database *sql.DB) {
 	movieUseCase := usecases.NewMovieUseCase(movieRepository)
 	movieController := controllers.NewMovieController(movieUseCase)
 
+	actorUseCase := usecases.NewActorUseCase(actorRepository)
+	actorController := controllers.NewActorController(actorUseCase)
+
 	apiV1 := server.Group("/api/v1")
 	{
 		healthController.RegisterRoutes(apiV1)
 		authenticationController.RegisterRoutes(apiV1)
 		movieController.RegisterRoutes(apiV1)
+		actorController.RegisterRoutes(apiV1)
 
 		protected := apiV1.Group("")
 		protected.Use(middlewares.AuthenticationMiddleware())
