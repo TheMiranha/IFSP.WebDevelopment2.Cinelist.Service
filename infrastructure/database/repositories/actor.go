@@ -31,7 +31,7 @@ func (repo *ActorRepository) GetAll() ([]entities.Actor, error) {
 		return []entities.Actor{}, err
 	}
 
-	var actors []entities.Actor
+	actors := make([]entities.Actor, 0)
 	var actor entities.Actor
 
 	for rows.Next() {

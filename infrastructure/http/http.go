@@ -13,6 +13,8 @@ import (
 func InitializeServer(database *sql.DB) {
 	server := gin.Default()
 
+	server.Use(middlewares.CORSMiddleware())
+
 	healthController := controllers.NewHealthController()
 
 	userRepository := repositories.NewUserRepository(database)
