@@ -3,15 +3,15 @@ package usecases
 import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
-	"cinelist/infrastructure/database/repositories"
+	domain_repositories "cinelist/domain/repositories"
 	"time"
 )
 
 type MovieUseCase struct {
-	repo repositories.MovieRepository
+	repo domain_repositories.MovieRepository
 }
 
-func NewMovieUseCase(repo repositories.MovieRepository) MovieUseCase {
+func NewMovieUseCase(repo domain_repositories.MovieRepository) MovieUseCase {
 	return MovieUseCase{repo: repo}
 }
 
@@ -95,21 +95,21 @@ func (uc *MovieUseCase) GetMovieById(id string) (dtos.MovieDetailData, *dtos.Req
 
 	ratingsWithUser, err := uc.repo.GetRatingsWithUserByMovieID(id)
 	if err != nil {
-		ratingsWithUser = []repositories.RatingWithUser{}
+		ratingsWithUser = []domain_repositories.RatingWithUser{}
 	}
 
 	ratings := make([]dtos.RatingDTO, 0)
 	for _, rating := range ratingsWithUser {
 		ratings = append(ratings, dtos.RatingDTO{
 			User: dtos.RatingUserDTO{
-				ID:       rating.UserID.String(),
+				ID:       rating.UserID,
 				Name:     rating.UserName,
 				ImageUrl: rating.UserImageUrl,
 			},
 			Rate:        rating.Rate,
 			Description: rating.Description,
-			CreatedAt:   rating.CreatedAt.Format(time.RFC3339),
-			UpdatedAt:   rating.UpdatedAt.Format(time.RFC3339),
+			CreatedAt:   rating.CreatedAt,
+			UpdatedAt:   rating.UpdatedAt,
 		})
 	}
 

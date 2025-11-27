@@ -3,14 +3,14 @@ package usecases
 import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
-	"cinelist/infrastructure/database/repositories"
+	domain_repositories "cinelist/domain/repositories"
 )
 
 type ActorUseCase struct {
-	repo repositories.ActorRepository
+	repo domain_repositories.ActorRepository
 }
 
-func NewActorUseCase(repo repositories.ActorRepository) ActorUseCase {
+func NewActorUseCase(repo domain_repositories.ActorRepository) ActorUseCase {
 	return ActorUseCase{repo: repo}
 }
 

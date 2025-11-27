@@ -3,36 +3,32 @@ package usecases
 import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
-	"cinelist/infrastructure/database/repositories"
-	"database/sql"
-	"errors"
+	domain_repositories "cinelist/domain/repositories"
 
 	"github.com/google/uuid"
 )
 
 type MovieInteractionUseCase struct {
-	repo repositories.MovieInteractionRepository
+	repo domain_repositories.MovieInteractionRepository
 }
 
-func NewMovieInteractionUseCase(repo repositories.MovieInteractionRepository) MovieInteractionUseCase {
+func NewMovieInteractionUseCase(repo domain_repositories.MovieInteractionRepository) MovieInteractionUseCase {
 	return MovieInteractionUseCase{repo: repo}
 }
 
 func (uc *MovieInteractionUseCase) FavoriteMovie(userID uuid.UUID, movieID uuid.UUID) (bool, *dtos.RequestError) {
 	// Verifica se o filme já está favoritado
-	_, err := uc.repo.GetFavoriteByUserAndMovie(userID, movieID)
+	favorite, err := uc.repo.GetFavoriteByUserAndMovie(userID, movieID)
 	if err == nil {
-		// Já está favoritado, então remove
-		err = uc.repo.DeleteFavorite(userID, movieID)
-		if err != nil {
-			return false, dtos.NewRequestError("Error while unfavoriting movie")
+		// Verifica se a entidade não está vazia (encontrou)
+		if favorite.User != uuid.Nil && favorite.Movie != uuid.Nil {
+			// Já está favoritado, então remove
+			err = uc.repo.DeleteFavorite(userID, movieID)
+			if err != nil {
+				return false, dtos.NewRequestError("Error while unfavoriting movie")
+			}
+			return false, nil // false = foi removido
 		}
-		return false, nil // false = foi removido
-	}
-
-	// Se o erro não for "não encontrado", retorna o erro
-	if !errors.Is(err, sql.ErrNoRows) {
-		return false, dtos.NewRequestError("Error while checking favorite status")
 	}
 
 	// Não está favoritado, então adiciona

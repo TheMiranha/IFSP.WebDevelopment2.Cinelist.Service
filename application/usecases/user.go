@@ -3,17 +3,17 @@ package usecases
 import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
-	"cinelist/infrastructure/database/repositories"
+	domain_repositories "cinelist/domain/repositories"
 
 	"github.com/google/uuid"
 )
 
 type UserUseCase struct {
-	repo              repositories.UserRepository
-	interactionRepo   repositories.MovieInteractionRepository
+	repo              domain_repositories.UserRepository
+	interactionRepo   domain_repositories.MovieInteractionRepository
 }
 
-func NewUserUseCase(repo repositories.UserRepository, interactionRepo repositories.MovieInteractionRepository) UserUseCase {
+func NewUserUseCase(repo domain_repositories.UserRepository, interactionRepo domain_repositories.MovieInteractionRepository) UserUseCase {
 	return UserUseCase{
 		repo:            repo,
 		interactionRepo: interactionRepo,

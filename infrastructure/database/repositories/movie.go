@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"cinelist/domain/entities"
+	domain_repositories "cinelist/domain/repositories"
 	"database/sql"
 	"fmt"
 	"time"
@@ -267,15 +268,6 @@ func (repo *MovieRepository) GetById(id string) (entities.Movie, error) {
 	return movie, nil
 }
 
-type RatingWithUser struct {
-	UserID      uuid.UUID
-	UserName    string
-	UserImageUrl string
-	Rate        float64
-	Description string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
 
 func (repo *MovieRepository) GetWatchedByMovieID(movieID string) ([]entities.Watched, error) {
 	query := `SELECT "user", "movie", rate, description, created_at, updated_at 
@@ -311,7 +303,7 @@ func (repo *MovieRepository) GetWatchedByMovieID(movieID string) ([]entities.Wat
 	return watchedList, nil
 }
 
-func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]RatingWithUser, error) {
+func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]domain_repositories.RatingWithUser, error) {
 	query := `SELECT w."user", u.name, u.image_url, w.rate, w.description, w.created_at, w.updated_at
 	          FROM watched w
 	          LEFT JOIN users u ON w."user" = u.id
@@ -321,24 +313,27 @@ func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]Rati
 	rows, err := repo.db.Query(query, movieID)
 
 	if err != nil {
-		return []RatingWithUser{}, err
+		return []domain_repositories.RatingWithUser{}, err
 	}
 	defer rows.Close()
 
-	ratings := make([]RatingWithUser, 0)
-	var rating RatingWithUser
+	ratings := make([]domain_repositories.RatingWithUser, 0)
+	var rating domain_repositories.RatingWithUser
+	var userID uuid.UUID
 	var userName sql.NullString
 	var userImageUrl sql.NullString
+	var createdAt time.Time
+	var updatedAt time.Time
 
 	for rows.Next() {
 		err := rows.Scan(
-			&rating.UserID,
+			&userID,
 			&userName,
 			&userImageUrl,
 			&rating.Rate,
 			&rating.Description,
-			&rating.CreatedAt,
-			&rating.UpdatedAt,
+			&createdAt,
+			&updatedAt,
 		)
 
 		if err != nil {
@@ -359,11 +354,15 @@ func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]Rati
 			rating.UserImageUrl = ""
 		}
 
+		rating.UserID = userID.String()
+		rating.CreatedAt = createdAt.Format(time.RFC3339)
+		rating.UpdatedAt = updatedAt.Format(time.RFC3339)
+
 		ratings = append(ratings, rating)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []RatingWithUser{}, err
+		return []domain_repositories.RatingWithUser{}, err
 	}
 
 	return ratings, nil

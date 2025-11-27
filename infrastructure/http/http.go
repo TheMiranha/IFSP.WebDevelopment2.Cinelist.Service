@@ -3,6 +3,7 @@ package infrastructure_http
 import (
 	"cinelist/application/usecases"
 	"cinelist/infrastructure/database/repositories"
+	infrastructure_services "cinelist/infrastructure/services"
 	"cinelist/infrastructure/http/controllers"
 	"cinelist/infrastructure/http/middlewares"
 	"database/sql"
@@ -22,7 +23,8 @@ func InitializeServer(database *sql.DB) {
 	actorRepository := repositories.NewActorRepository(database)
 	movieInteractionRepository := repositories.NewMovieInteractionRepository(database)
 
-	authenticationUseCase := usecases.NewAuthenticationUseCase(userRepository)
+	authService := infrastructure_services.NewAuthService()
+	authenticationUseCase := usecases.NewAuthenticationUseCase(userRepository, authService)
 	authenticationController := controllers.NewAuthenticationController(authenticationUseCase)
 
 	userUseCase := usecases.NewUserUseCase(userRepository, movieInteractionRepository)

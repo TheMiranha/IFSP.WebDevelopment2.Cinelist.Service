@@ -3,8 +3,8 @@ package usecases
 import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
-	infrastructure_utils "cinelist/infrastructure"
-	"cinelist/infrastructure/database/repositories"
+	domain_repositories "cinelist/domain/repositories"
+	domain_services "cinelist/domain/services"
 	"fmt"
 	"time"
 
@@ -12,11 +12,15 @@ import (
 )
 
 type AuthenticationUseCase struct {
-	repo repositories.UserRepository
+	repo        domain_repositories.UserRepository
+	authService domain_services.AuthService
 }
 
-func NewAuthenticationUseCase(repo repositories.UserRepository) AuthenticationUseCase {
-	return AuthenticationUseCase{repo: repo}
+func NewAuthenticationUseCase(repo domain_repositories.UserRepository, authService domain_services.AuthService) AuthenticationUseCase {
+	return AuthenticationUseCase{
+		repo:        repo,
+		authService: authService,
+	}
 }
 
 func (u *AuthenticationUseCase) SignIn(payload dtos.SignInDTO) (dtos.SignInResponseDTO, *dtos.RequestError) {
@@ -26,13 +30,13 @@ func (u *AuthenticationUseCase) SignIn(payload dtos.SignInDTO) (dtos.SignInRespo
 		return dtos.SignInResponseDTO{}, dtos.NewRequestError("Invalid credentials")
 	}
 
-	samePassword := infrastructure_utils.CheckPasswordHash(payload.Password, user.Password)
+	samePassword := u.authService.CheckPasswordHash(payload.Password, user.Password)
 
 	if !samePassword {
 		return dtos.SignInResponseDTO{}, dtos.NewRequestError("Invalid credentials")
 	}
 
-	token, err := infrastructure_utils.GenerateJWT(user.ID)
+	token, err := u.authService.GenerateJWT(user.ID)
 
 	if err != nil {
 		return dtos.SignInResponseDTO{}, dtos.NewRequestError("Error on token generation")
@@ -52,7 +56,7 @@ func (u *AuthenticationUseCase) Create(payload dtos.SignUpDTO) (dtos.SignUpRespo
 		return dtos.SignUpResponseDTO{}, dtos.NewRequestError("Email already in use")
 	}
 
-	hashedPassword, err := infrastructure_utils.HashPassword(payload.Password)
+	hashedPassword, err := u.authService.HashPassword(payload.Password)
 
 	if err != nil {
 		return dtos.SignUpResponseDTO{}, &dtos.RequestError{Success: false, Message: "Error on password hashing"}
@@ -70,7 +74,7 @@ func (u *AuthenticationUseCase) Create(payload dtos.SignUpDTO) (dtos.SignUpRespo
 
 	u.repo.Create(user)
 
-	token, err := infrastructure_utils.GenerateJWT(user.ID)
+	token, err := u.authService.GenerateJWT(user.ID)
 
 	if err != nil {
 		fmt.Println(err)
