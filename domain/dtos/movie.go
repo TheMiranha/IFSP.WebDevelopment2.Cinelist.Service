@@ -38,3 +38,22 @@ type MovieDetailResponseDTO struct {
 	Success bool            `json:"success"`
 	Data    MovieDetailData `json:"data"`
 }
+
+type FavoriteMovieDTO struct {
+	MovieId string `json:"movieId" binding:"required"`
+}
+
+type ToWatchMovieDTO struct {
+	MovieId string `json:"movieId" binding:"required"`
+}
+
+type WatchedMovieDTO struct {
+	MovieId    string  `json:"movieId" binding:"required"`
+	Rate       float64 `json:"rate" binding:"required"`
+	Description string `json:"description"`
+}
+
+type SuccessResponseDTO struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}

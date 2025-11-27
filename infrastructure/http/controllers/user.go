@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"cinelist/application/usecases"
+	"cinelist/domain/dtos"
 	"fmt"
 	"net/http"
 
@@ -32,12 +33,15 @@ func (c *UserController) MeRoute(ctx *gin.Context) {
 
 	userID := idFromCtx.(uuid.UUID)
 
-	userData, errResponse := c.usecase.GetUserById(userID) // (Assumindo que GetUserById espera uuid.UUID)
+	userData, errResponse := c.usecase.GetUserById(userID)
 
 	if errResponse != nil {
 		ctx.JSON(http.StatusNotFound, errResponse)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, userData)
+	ctx.JSON(http.StatusOK, dtos.UserResponseDTO{
+		Success: true,
+		Data:    userData,
+	})
 }

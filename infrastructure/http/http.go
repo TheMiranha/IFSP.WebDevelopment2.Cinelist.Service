@@ -20,11 +20,12 @@ func InitializeServer(database *sql.DB) {
 	userRepository := repositories.NewUserRepository(database)
 	movieRepository := repositories.NewMovieRepository(database)
 	actorRepository := repositories.NewActorRepository(database)
+	movieInteractionRepository := repositories.NewMovieInteractionRepository(database)
 
 	authenticationUseCase := usecases.NewAuthenticationUseCase(userRepository)
 	authenticationController := controllers.NewAuthenticationController(authenticationUseCase)
 
-	userUseCase := usecases.NewUserUseCase(userRepository)
+	userUseCase := usecases.NewUserUseCase(userRepository, movieInteractionRepository)
 	userController := controllers.NewUserController(userUseCase)
 
 	movieUseCase := usecases.NewMovieUseCase(movieRepository)
@@ -32,6 +33,9 @@ func InitializeServer(database *sql.DB) {
 
 	actorUseCase := usecases.NewActorUseCase(actorRepository)
 	actorController := controllers.NewActorController(actorUseCase)
+
+	movieInteractionUseCase := usecases.NewMovieInteractionUseCase(movieInteractionRepository)
+	movieInteractionController := controllers.NewMovieInteractionController(movieInteractionUseCase)
 
 	apiV1 := server.Group("/api/v1")
 	{
@@ -44,6 +48,7 @@ func InitializeServer(database *sql.DB) {
 		protected.Use(middlewares.AuthenticationMiddleware())
 		{
 			userController.RegisterRoutes(protected)
+			movieInteractionController.RegisterRoutes(protected)
 		}
 	}
 
