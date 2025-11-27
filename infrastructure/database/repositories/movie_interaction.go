@@ -34,6 +34,26 @@ func (repo *MovieInteractionRepository) DeleteFavorite(userID uuid.UUID, movieID
 	return err
 }
 
+func (repo *MovieInteractionRepository) GetFavoriteByUserAndMovie(userID uuid.UUID, movieID uuid.UUID) (entities.Favorite, error) {
+	query := `SELECT "user", "movie", created_at, updated_at 
+	          FROM favorites 
+	          WHERE "user" = $1 AND "movie" = $2`
+
+	var favorite entities.Favorite
+	err := repo.db.QueryRow(query, userID, movieID).Scan(
+		&favorite.User,
+		&favorite.Movie,
+		&favorite.CreatedAt,
+		&favorite.UpdatedAt,
+	)
+
+	if err != nil {
+		return entities.Favorite{}, err
+	}
+
+	return favorite, nil
+}
+
 // ToWatch methods
 func (repo *MovieInteractionRepository) CreateToWatch(userID uuid.UUID, movieID uuid.UUID) error {
 	query := `INSERT INTO to_watch ("user", "movie", created_at, updated_at) 

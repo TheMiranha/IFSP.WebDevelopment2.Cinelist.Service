@@ -48,15 +48,22 @@ func (c *MovieInteractionController) FavoriteMovie(ctx *gin.Context) {
 		return
 	}
 
-	errResponse := c.usecase.FavoriteMovie(userID, movieID)
+	isFavorited, errResponse := c.usecase.FavoriteMovie(userID, movieID)
 	if errResponse != nil {
 		ctx.JSON(http.StatusInternalServerError, errResponse)
 		return
 	}
 
+	var message string
+	if isFavorited {
+		message = "Movie favorited successfully"
+	} else {
+		message = "Movie unfavorited successfully"
+	}
+
 	ctx.JSON(http.StatusOK, dtos.SuccessResponseDTO{
 		Success: true,
-		Message: "Movie favorited successfully",
+		Message: message,
 	})
 }
 

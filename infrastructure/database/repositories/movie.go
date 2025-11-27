@@ -314,8 +314,8 @@ func (repo *MovieRepository) GetWatchedByMovieID(movieID string) ([]entities.Wat
 func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]RatingWithUser, error) {
 	query := `SELECT w."user", u.name, u.image_url, w.rate, w.description, w.created_at, w.updated_at
 	          FROM watched w
-	          INNER JOIN users u ON w."user" = u.id
-	          WHERE w."movie" = $1
+	          LEFT JOIN users u ON w."user" = u.id
+	          WHERE w."movie" = $1 AND w.rate IS NOT NULL
 	          ORDER BY w.created_at DESC`
 
 	rows, err := repo.db.Query(query, movieID)
@@ -323,15 +323,18 @@ func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]Rati
 	if err != nil {
 		return []RatingWithUser{}, err
 	}
+	defer rows.Close()
 
 	ratings := make([]RatingWithUser, 0)
 	var rating RatingWithUser
+	var userName sql.NullString
+	var userImageUrl sql.NullString
 
 	for rows.Next() {
 		err := rows.Scan(
 			&rating.UserID,
-			&rating.UserName,
-			&rating.UserImageUrl,
+			&userName,
+			&userImageUrl,
 			&rating.Rate,
 			&rating.Description,
 			&rating.CreatedAt,
@@ -340,9 +343,27 @@ func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]Rati
 
 		if err != nil {
 			fmt.Println(err)
-		} else {
-			ratings = append(ratings, rating)
+			continue
 		}
+
+		// Handle NULL values from LEFT JOIN
+		if userName.Valid {
+			rating.UserName = userName.String
+		} else {
+			rating.UserName = ""
+		}
+
+		if userImageUrl.Valid {
+			rating.UserImageUrl = userImageUrl.String
+		} else {
+			rating.UserImageUrl = ""
+		}
+
+		ratings = append(ratings, rating)
+	}
+
+	if err = rows.Err(); err != nil {
+		return []RatingWithUser{}, err
 	}
 
 	return ratings, nil
