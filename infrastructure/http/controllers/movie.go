@@ -21,6 +21,8 @@ func NewMovieController(usecase usecases.MovieUseCase) MovieController {
 func (uc *MovieController) RegisterRoutes(router *gin.RouterGroup) {
 	router.GET("/movies", uc.GetAll)
 	router.GET("/movies/search", uc.Search)
+	router.GET("/movies/top-movies", uc.GetTopMovies)
+	router.GET("/movies/by-id/:id", uc.GetMovieById)
 }
 
 func (uc *MovieController) GetAll(ctx *gin.Context) {
@@ -65,15 +67,45 @@ func (uc *MovieController) Search(ctx *gin.Context) {
 		return
 	}
 
-	moviesWithCast, err := uc.usecase.Search(term)
+	movies, err := uc.usecase.GetAllByTitle(term)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dtos.MoviesWithCastResponseDTO{
+	ctx.JSON(http.StatusOK, dtos.MoviesResponseDTO{
 		Success: true,
-		Data:    moviesWithCast,
+		Data:    movies,
+	})
+}
+
+func (uc *MovieController) GetTopMovies(ctx *gin.Context) {
+	topMovies, err := uc.usecase.GetTopMovies()
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dtos.TopMoviesResponseDTO{
+		Success: true,
+		Data:    topMovies,
+	})
+}
+
+func (uc *MovieController) GetMovieById(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	movieDetail, err := uc.usecase.GetMovieById(id)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dtos.MovieDetailResponseDTO{
+		Success: true,
+		Data:    movieDetail,
 	})
 }

@@ -57,3 +57,49 @@ func (uc *MovieUseCase) Search(term string) ([]dtos.MovieWithCast, *dtos.Request
 
 	return moviesWithCast, nil
 }
+
+func (uc *MovieUseCase) GetTopMovies() (dtos.TopMoviesData, *dtos.RequestError) {
+	classics, err := uc.repo.GetClassics()
+	if err != nil {
+		return dtos.TopMoviesData{}, dtos.NewRequestError("Error while fetching classics")
+	}
+
+	highlights, err := uc.repo.GetHighlights()
+	if err != nil {
+		return dtos.TopMoviesData{}, dtos.NewRequestError("Error while fetching highlights")
+	}
+
+	newReleases, err := uc.repo.GetNewReleases()
+	if err != nil {
+		return dtos.TopMoviesData{}, dtos.NewRequestError("Error while fetching new releases")
+	}
+
+	return dtos.TopMoviesData{
+		Classics:    classics,
+		Highlights:  highlights,
+		NewReleases: newReleases,
+	}, nil
+}
+
+func (uc *MovieUseCase) GetMovieById(id string) (dtos.MovieDetailData, *dtos.RequestError) {
+	movie, err := uc.repo.GetById(id)
+	if err != nil {
+		return dtos.MovieDetailData{}, dtos.NewRequestError("Movie not found")
+	}
+
+	cast, err := uc.repo.GetCastByMovieID(id)
+	if err != nil {
+		cast = []entities.Actor{}
+	}
+
+	ratings, err := uc.repo.GetWatchedByMovieID(id)
+	if err != nil {
+		ratings = []entities.Watched{}
+	}
+
+	return dtos.MovieDetailData{
+		Movie:   movie,
+		Cast:    cast,
+		Ratings: ratings,
+	}, nil
+}

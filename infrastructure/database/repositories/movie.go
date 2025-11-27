@@ -125,3 +125,175 @@ func (repo *MovieRepository) GetCastByMovieID(movieID string) ([]entities.Actor,
 
 	return actors, nil
 }
+
+func (repo *MovieRepository) GetClassics() ([]entities.Movie, error) {
+	query := `SELECT id, title, description, image_url, released_at, created_at, updated_at, tmdb_rate 
+	          FROM movies 
+	          WHERE released_at IS NOT NULL 
+	          ORDER BY released_at 
+	          LIMIT 50`
+
+	rows, err := repo.db.Query(query)
+
+	if err != nil {
+		return []entities.Movie{}, err
+	}
+
+	movies := make([]entities.Movie, 0)
+	var movie entities.Movie
+
+	for rows.Next() {
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.Description,
+			&movie.ImageUrl,
+			&movie.ReleasedAt,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+			&movie.TMDBRate,
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			movies = append(movies, movie)
+		}
+	}
+
+	return movies, nil
+}
+
+func (repo *MovieRepository) GetHighlights() ([]entities.Movie, error) {
+	query := `SELECT id, title, description, image_url, released_at, created_at, updated_at, tmdb_rate 
+	          FROM movies 
+	          WHERE tmdb_rate IS NOT NULL 
+	          ORDER BY tmdb_rate DESC 
+	          LIMIT 51`
+
+	rows, err := repo.db.Query(query)
+
+	if err != nil {
+		return []entities.Movie{}, err
+	}
+
+	movies := make([]entities.Movie, 0)
+	var movie entities.Movie
+
+	for rows.Next() {
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.Description,
+			&movie.ImageUrl,
+			&movie.ReleasedAt,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+			&movie.TMDBRate,
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			movies = append(movies, movie)
+		}
+	}
+
+	return movies, nil
+}
+
+func (repo *MovieRepository) GetNewReleases() ([]entities.Movie, error) {
+	query := `SELECT id, title, description, image_url, released_at, created_at, updated_at, tmdb_rate 
+	          FROM movies 
+	          WHERE released_at IS NOT NULL 
+	          ORDER BY released_at DESC 
+	          LIMIT 50`
+
+	rows, err := repo.db.Query(query)
+
+	if err != nil {
+		return []entities.Movie{}, err
+	}
+
+	movies := make([]entities.Movie, 0)
+	var movie entities.Movie
+
+	for rows.Next() {
+		err := rows.Scan(
+			&movie.ID,
+			&movie.Title,
+			&movie.Description,
+			&movie.ImageUrl,
+			&movie.ReleasedAt,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+			&movie.TMDBRate,
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			movies = append(movies, movie)
+		}
+	}
+
+	return movies, nil
+}
+
+func (repo *MovieRepository) GetById(id string) (entities.Movie, error) {
+	query := `SELECT id, title, description, image_url, released_at, created_at, updated_at, tmdb_rate 
+	          FROM movies 
+	          WHERE id = $1`
+
+	var movie entities.Movie
+	err := repo.db.QueryRow(query, id).Scan(
+		&movie.ID,
+		&movie.Title,
+		&movie.Description,
+		&movie.ImageUrl,
+		&movie.ReleasedAt,
+		&movie.CreatedAt,
+		&movie.UpdatedAt,
+		&movie.TMDBRate,
+	)
+
+	if err != nil {
+		return entities.Movie{}, err
+	}
+
+	return movie, nil
+}
+
+func (repo *MovieRepository) GetWatchedByMovieID(movieID string) ([]entities.Watched, error) {
+	query := `SELECT "user", "movie", rate, description, created_at, updated_at 
+	          FROM watched 
+	          WHERE "movie" = $1`
+
+	rows, err := repo.db.Query(query, movieID)
+
+	if err != nil {
+		return []entities.Watched{}, err
+	}
+
+	watchedList := make([]entities.Watched, 0)
+	var watched entities.Watched
+
+	for rows.Next() {
+		err := rows.Scan(
+			&watched.User,
+			&watched.Movie,
+			&watched.Rate,
+			&watched.Description,
+			&watched.CreatedAt,
+			&watched.UpdatedAt,
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			watchedList = append(watchedList, watched)
+		}
+	}
+
+	return watchedList, nil
+}
