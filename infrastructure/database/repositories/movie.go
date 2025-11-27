@@ -4,6 +4,9 @@ import (
 	"cinelist/domain/entities"
 	"database/sql"
 	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type MovieRepository struct {
@@ -264,6 +267,16 @@ func (repo *MovieRepository) GetById(id string) (entities.Movie, error) {
 	return movie, nil
 }
 
+type RatingWithUser struct {
+	UserID      uuid.UUID
+	UserName    string
+	UserImageUrl string
+	Rate        float64
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 func (repo *MovieRepository) GetWatchedByMovieID(movieID string) ([]entities.Watched, error) {
 	query := `SELECT "user", "movie", rate, description, created_at, updated_at 
 	          FROM watched 
@@ -296,4 +309,41 @@ func (repo *MovieRepository) GetWatchedByMovieID(movieID string) ([]entities.Wat
 	}
 
 	return watchedList, nil
+}
+
+func (repo *MovieRepository) GetRatingsWithUserByMovieID(movieID string) ([]RatingWithUser, error) {
+	query := `SELECT w."user", u.name, u.image_url, w.rate, w.description, w.created_at, w.updated_at
+	          FROM watched w
+	          INNER JOIN users u ON w."user" = u.id
+	          WHERE w."movie" = $1
+	          ORDER BY w.created_at DESC`
+
+	rows, err := repo.db.Query(query, movieID)
+
+	if err != nil {
+		return []RatingWithUser{}, err
+	}
+
+	ratings := make([]RatingWithUser, 0)
+	var rating RatingWithUser
+
+	for rows.Next() {
+		err := rows.Scan(
+			&rating.UserID,
+			&rating.UserName,
+			&rating.UserImageUrl,
+			&rating.Rate,
+			&rating.Description,
+			&rating.CreatedAt,
+			&rating.UpdatedAt,
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			ratings = append(ratings, rating)
+		}
+	}
+
+	return ratings, nil
 }

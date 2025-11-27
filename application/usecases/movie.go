@@ -4,6 +4,7 @@ import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
 	"cinelist/infrastructure/database/repositories"
+	"time"
 )
 
 type MovieUseCase struct {
@@ -92,9 +93,24 @@ func (uc *MovieUseCase) GetMovieById(id string) (dtos.MovieDetailData, *dtos.Req
 		cast = []entities.Actor{}
 	}
 
-	ratings, err := uc.repo.GetWatchedByMovieID(id)
+	ratingsWithUser, err := uc.repo.GetRatingsWithUserByMovieID(id)
 	if err != nil {
-		ratings = []entities.Watched{}
+		ratingsWithUser = []repositories.RatingWithUser{}
+	}
+
+	ratings := make([]dtos.RatingDTO, 0)
+	for _, rating := range ratingsWithUser {
+		ratings = append(ratings, dtos.RatingDTO{
+			User: dtos.RatingUserDTO{
+				ID:       rating.UserID.String(),
+				Name:     rating.UserName,
+				ImageUrl: rating.UserImageUrl,
+			},
+			Rate:        rating.Rate,
+			Description: rating.Description,
+			CreatedAt:   rating.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:   rating.UpdatedAt.Format(time.RFC3339),
+		})
 	}
 
 	return dtos.MovieDetailData{

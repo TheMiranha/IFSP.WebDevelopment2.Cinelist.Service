@@ -28,10 +28,24 @@ type TopMoviesResponseDTO struct {
 	Data    TopMoviesData `json:"data"`
 }
 
+type RatingDTO struct {
+	User        RatingUserDTO `json:"user"`
+	Rate        float64       `json:"rate"`
+	Description string        `json:"description"`
+	CreatedAt   string        `json:"createdAt"`
+	UpdatedAt   string        `json:"updatedAt"`
+}
+
+type RatingUserDTO struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	ImageUrl string `json:"imageUrl"`
+}
+
 type MovieDetailData struct {
-	Movie   entities.Movie     `json:"movie"`
-	Cast    []entities.Actor   `json:"cast"`
-	Ratings []entities.Watched `json:"ratings"`
+	Movie   entities.Movie `json:"movie"`
+	Cast    []entities.Actor `json:"cast"`
+	Ratings []RatingDTO    `json:"ratings"`
 }
 
 type MovieDetailResponseDTO struct {
