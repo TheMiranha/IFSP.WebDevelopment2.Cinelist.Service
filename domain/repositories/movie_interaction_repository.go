@@ -20,3 +20,4 @@ type MovieInteractionRepository interface {
 	GetWatchedByUserID(userID uuid.UUID) ([]entities.Watched, error)
 }
 
+

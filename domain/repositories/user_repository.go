@@ -12,3 +12,4 @@ type UserRepository interface {
 	GetByEmail(email string) (entities.User, error)
 }
 
+

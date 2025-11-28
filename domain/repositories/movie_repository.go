@@ -25,3 +25,4 @@ type RatingWithUser struct {
 	UpdatedAt   string
 }
 
+

@@ -10,3 +10,4 @@ type AuthService interface {
 	GenerateJWT(userID uuid.UUID) (string, error)
 }
 
+

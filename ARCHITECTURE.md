@@ -203,3 +203,4 @@ A aplicação segue rigorosamente os princípios da Clean Architecture, garantin
 
 Todas as dependências apontam para o centro (domínio), mantendo o código de negócio puro e independente de detalhes de implementação.
 
+

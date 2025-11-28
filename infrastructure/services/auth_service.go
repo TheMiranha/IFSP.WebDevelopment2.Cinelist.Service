@@ -50,3 +50,4 @@ func (s *AuthService) GenerateJWT(userID uuid.UUID) (string, error) {
 	return tokenString, err
 }
 
+
