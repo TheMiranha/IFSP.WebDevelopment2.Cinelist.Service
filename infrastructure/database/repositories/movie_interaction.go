@@ -129,6 +129,7 @@ func (repo *MovieInteractionRepository) GetFavoritesByUserID(userID uuid.UUID) (
 
 	movies := make([]entities.Movie, 0)
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -139,11 +140,16 @@ func (repo *MovieInteractionRepository) GetFavoritesByUserID(userID uuid.UUID) (
 			&movie.ReleasedAt,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
-			&movie.TMDBRate,
+			&tmdbRate,
 		)
 
 		if err != nil {
 			continue
+		}
+		if tmdbRate.Valid {
+			movie.TMDBRate = tmdbRate.Float64
+		} else {
+			movie.TMDBRate = 0.0
 		}
 		movies = append(movies, movie)
 	}
@@ -164,6 +170,7 @@ func (repo *MovieInteractionRepository) GetToWatchByUserID(userID uuid.UUID) ([]
 
 	movies := make([]entities.Movie, 0)
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -174,11 +181,16 @@ func (repo *MovieInteractionRepository) GetToWatchByUserID(userID uuid.UUID) ([]
 			&movie.ReleasedAt,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
-			&movie.TMDBRate,
+			&tmdbRate,
 		)
 
 		if err != nil {
 			continue
+		}
+		if tmdbRate.Valid {
+			movie.TMDBRate = tmdbRate.Float64
+		} else {
+			movie.TMDBRate = 0.0
 		}
 		movies = append(movies, movie)
 	}
