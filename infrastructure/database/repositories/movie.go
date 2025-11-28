@@ -15,8 +15,8 @@ type MovieRepository struct {
 	moviesInCache []entities.Movie
 }
 
-func NewMovieRepository(db *sql.DB) MovieRepository {
-	return MovieRepository{db: db, moviesInCache: []entities.Movie{}}
+func NewMovieRepository(db *sql.DB) *MovieRepository {
+	return &MovieRepository{db: db, moviesInCache: []entities.Movie{}}
 }
 
 func (repo *MovieRepository) GetAll() ([]entities.Movie, error) {

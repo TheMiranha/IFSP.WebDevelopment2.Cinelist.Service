@@ -12,8 +12,8 @@ type MovieInteractionRepository struct {
 	db *sql.DB
 }
 
-func NewMovieInteractionRepository(db *sql.DB) MovieInteractionRepository {
-	return MovieInteractionRepository{db: db}
+func NewMovieInteractionRepository(db *sql.DB) *MovieInteractionRepository {
+	return &MovieInteractionRepository{db: db}
 }
 
 // Favorite methods

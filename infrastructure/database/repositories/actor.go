@@ -11,8 +11,8 @@ type ActorRepository struct {
 	actorsInCache []entities.Actor
 }
 
-func NewActorRepository(db *sql.DB) ActorRepository {
-	return ActorRepository{
+func NewActorRepository(db *sql.DB) *ActorRepository {
+	return &ActorRepository{
 		db:            db,
 		actorsInCache: []entities.Actor{},
 	}
