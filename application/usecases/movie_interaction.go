@@ -45,7 +45,7 @@ func (uc *MovieInteractionUseCase) ToWatchMovie(userID uuid.UUID, movieID uuid.U
 		if ToWatch.User != uuid.Nil && ToWatch.Movie != uuid.Nil {
 			err = uc.repo.DeleteToWatch(userID, movieID)
 			if err != nil {
-				return false, dtos.NewRequestError("Error while removing movie from to watch list")
+				return false, dtos.NewRequestError("Error while removing movie from watch list")
 			}
 			return false, nil
 		}
@@ -53,7 +53,7 @@ func (uc *MovieInteractionUseCase) ToWatchMovie(userID uuid.UUID, movieID uuid.U
 
 	err = uc.repo.CreateToWatch(userID, movieID)
 	if err != nil {
-		return false, dtos.NewRequestError("Error while add to to watch list movie")
+		return false, dtos.NewRequestError("Error while adding movie to watch list")
 	}
 	return true, nil
 }
