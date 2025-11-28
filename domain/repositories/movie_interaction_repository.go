@@ -12,6 +12,7 @@ type MovieInteractionRepository interface {
 	GetFavoriteByUserAndMovie(userID uuid.UUID, movieID uuid.UUID) (entities.Favorite, error)
 	CreateToWatch(userID uuid.UUID, movieID uuid.UUID) error
 	DeleteToWatch(userID uuid.UUID, movieID uuid.UUID) error
+	GetToWatchByUserAndMovie(userID uuid.UUID, movieID uuid.UUID) (entities.ToWatch, error)
 	CreateWatched(watched entities.Watched) error
 	UpdateWatched(watched entities.Watched) error
 	GetWatchedByUserAndMovie(userID uuid.UUID, movieID uuid.UUID) (entities.Watched, error)
@@ -19,5 +20,3 @@ type MovieInteractionRepository interface {
 	GetToWatchByUserID(userID uuid.UUID) ([]entities.Movie, error)
 	GetWatchedByUserID(userID uuid.UUID) ([]entities.Watched, error)
 }
-
-

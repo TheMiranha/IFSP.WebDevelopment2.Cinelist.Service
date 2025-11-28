@@ -15,8 +15,8 @@ type MovieRepository struct {
 	moviesInCache []entities.Movie
 }
 
-func NewMovieRepository(db *sql.DB) MovieRepository {
-	return MovieRepository{db: db, moviesInCache: []entities.Movie{}}
+func NewMovieRepository(db *sql.DB) *MovieRepository {
+	return &MovieRepository{db: db, moviesInCache: []entities.Movie{}}
 }
 
 func (repo *MovieRepository) GetAll() ([]entities.Movie, error) {
@@ -34,6 +34,7 @@ func (repo *MovieRepository) GetAll() ([]entities.Movie, error) {
 
 	movies := make([]entities.Movie, 0)
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -44,12 +45,17 @@ func (repo *MovieRepository) GetAll() ([]entities.Movie, error) {
 			&movie.ReleasedAt,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
-			&movie.TMDBRate,
+			&tmdbRate,
 		)
 
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			if tmdbRate.Valid {
+				movie.TMDBRate = tmdbRate.Float64
+			} else {
+				movie.TMDBRate = 0.0
+			}
 			movies = append(movies, movie)
 		}
 	}
@@ -73,6 +79,7 @@ func (repo *MovieRepository) SearchByTitle(term string) ([]entities.Movie, error
 
 	movies := make([]entities.Movie, 0)
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -83,12 +90,17 @@ func (repo *MovieRepository) SearchByTitle(term string) ([]entities.Movie, error
 			&movie.ReleasedAt,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
-			&movie.TMDBRate,
+			&tmdbRate,
 		)
 
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			if tmdbRate.Valid {
+				movie.TMDBRate = tmdbRate.Float64
+			} else {
+				movie.TMDBRate = 0.0
+			}
 			movies = append(movies, movie)
 		}
 	}
@@ -145,6 +157,7 @@ func (repo *MovieRepository) GetClassics() ([]entities.Movie, error) {
 
 	movies := make([]entities.Movie, 0)
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -155,12 +168,17 @@ func (repo *MovieRepository) GetClassics() ([]entities.Movie, error) {
 			&movie.ReleasedAt,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
-			&movie.TMDBRate,
+			&tmdbRate,
 		)
 
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			if tmdbRate.Valid {
+				movie.TMDBRate = tmdbRate.Float64
+			} else {
+				movie.TMDBRate = 0.0
+			}
 			movies = append(movies, movie)
 		}
 	}
@@ -221,6 +239,7 @@ func (repo *MovieRepository) GetNewReleases() ([]entities.Movie, error) {
 
 	movies := make([]entities.Movie, 0)
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -231,12 +250,17 @@ func (repo *MovieRepository) GetNewReleases() ([]entities.Movie, error) {
 			&movie.ReleasedAt,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
-			&movie.TMDBRate,
+			&tmdbRate,
 		)
 
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			if tmdbRate.Valid {
+				movie.TMDBRate = tmdbRate.Float64
+			} else {
+				movie.TMDBRate = 0.0
+			}
 			movies = append(movies, movie)
 		}
 	}
@@ -250,6 +274,7 @@ func (repo *MovieRepository) GetById(id string) (entities.Movie, error) {
 	          WHERE id = $1`
 
 	var movie entities.Movie
+	var tmdbRate sql.NullFloat64
 	err := repo.db.QueryRow(query, id).Scan(
 		&movie.ID,
 		&movie.Title,
@@ -258,11 +283,17 @@ func (repo *MovieRepository) GetById(id string) (entities.Movie, error) {
 		&movie.ReleasedAt,
 		&movie.CreatedAt,
 		&movie.UpdatedAt,
-		&movie.TMDBRate,
+		&tmdbRate,
 	)
 
 	if err != nil {
 		return entities.Movie{}, err
+	}
+
+	if tmdbRate.Valid {
+		movie.TMDBRate = tmdbRate.Float64
+	} else {
+		movie.TMDBRate = 0.0
 	}
 
 	return movie, nil
