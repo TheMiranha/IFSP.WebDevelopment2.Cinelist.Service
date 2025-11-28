@@ -39,12 +39,23 @@ func (uc *MovieInteractionUseCase) FavoriteMovie(userID uuid.UUID, movieID uuid.
 	return true, nil // true = foi adicionado
 }
 
-func (uc *MovieInteractionUseCase) AddToWatch(userID uuid.UUID, movieID uuid.UUID) *dtos.RequestError {
-	err := uc.repo.CreateToWatch(userID, movieID)
-	if err != nil {
-		return dtos.NewRequestError("Error while adding movie to watch list")
+func (uc *MovieInteractionUseCase) ToWatchMovie(userID uuid.UUID, movieID uuid.UUID) (bool, *dtos.RequestError) {
+	ToWatch, err := uc.repo.GetToWatchByUserAndMovie(userID, movieID)
+	if err == nil {
+		if ToWatch.User != uuid.Nil && ToWatch.Movie != uuid.Nil {
+			err = uc.repo.DeleteToWatch(userID, movieID)
+			if err != nil {
+				return false, dtos.NewRequestError("Error while removing movie from to watch list")
+			}
+			return false, nil
+		}
 	}
-	return nil
+
+	err = uc.repo.CreateToWatch(userID, movieID)
+	if err != nil {
+		return false, dtos.NewRequestError("Error while add to to watch list movie")
+	}
+	return true, nil
 }
 
 func (uc *MovieInteractionUseCase) CreateWatched(userID uuid.UUID, movieID uuid.UUID, rate float64, description string) *dtos.RequestError {
@@ -61,4 +72,3 @@ func (uc *MovieInteractionUseCase) CreateWatched(userID uuid.UUID, movieID uuid.
 	}
 	return nil
 }
-

@@ -4,7 +4,6 @@ import (
 	"cinelist/domain/dtos"
 	"cinelist/domain/entities"
 	domain_repositories "cinelist/domain/repositories"
-	"time"
 )
 
 type MovieUseCase struct {

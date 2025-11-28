@@ -22,7 +22,7 @@ func NewMovieInteractionController(usecase usecases.MovieInteractionUseCase) Mov
 
 func (c *MovieInteractionController) RegisterRoutes(router *gin.RouterGroup) {
 	router.POST("/movies/favorite", c.FavoriteMovie)
-	router.POST("/movies/to-watch", c.AddToWatch)
+	router.POST("/movies/to-watch", c.ToWatchMovie)
 	router.POST("/movies/watched", c.CreateWatched)
 }
 
@@ -67,7 +67,7 @@ func (c *MovieInteractionController) FavoriteMovie(ctx *gin.Context) {
 	})
 }
 
-func (c *MovieInteractionController) AddToWatch(ctx *gin.Context) {
+func (c *MovieInteractionController) ToWatchMovie(ctx *gin.Context) {
 	idFromCtx, exists := ctx.Get("id")
 	if !exists {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ID de usuário não encontrado no token"})
@@ -89,15 +89,22 @@ func (c *MovieInteractionController) AddToWatch(ctx *gin.Context) {
 		return
 	}
 
-	errResponse := c.usecase.AddToWatch(userID, movieID)
+	isToWacth, errResponse := c.usecase.ToWatchMovie(userID, movieID)
 	if errResponse != nil {
 		ctx.JSON(http.StatusInternalServerError, errResponse)
 		return
 	}
 
+	var message string
+	if isToWacth {
+		message = "Movie added to toWatch list successfully"
+	} else {
+		message = "Movie removed from toWatch list successfully"
+	}
+
 	ctx.JSON(http.StatusOK, dtos.SuccessResponseDTO{
 		Success: true,
-		Message: "Movie added to watch list successfully",
+		Message: message,
 	})
 }
 
@@ -134,4 +141,3 @@ func (c *MovieInteractionController) CreateWatched(ctx *gin.Context) {
 		Message: "Watched entry created successfully",
 	})
 }
-
